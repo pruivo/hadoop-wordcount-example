@@ -1,10 +1,12 @@
 package com.gustavonalle.hadoop;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.RawComparator;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
-import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.hadoopintegration.mapreduce.input.InfinispanInputFormat;
 import org.infinispan.hadoopintegration.mapreduce.output.InfinispanOutputFormat;
@@ -14,18 +16,33 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        JobConf jobConf = new JobConf(Main.class);
+        Configuration configuration = new Configuration();
+        //configuration.set("mapred.job.tracker", "172.17.0.13:9001");
+        configuration.set("mapreduce.ispn.inputsplit.remote.cache.host", "172.17.0.14");
+
+        configuration.set("mapreduce.ispn.input.remote.cache.host", "172.17.0.14");
+        configuration.set("mapreduce.ispn.output.remote.cache.host", "172.17.0.14");
+
+        configuration.set("mapreduce.ispn.input.cache.name", "map-reduce-in");
+        configuration.set("mapreduce.ispn.output.cache.name", "map-reduce-out");
+
+        configuration.set("mapreduce.ispn.input.converter", InputConverter.class.getCanonicalName());
+        configuration.set("mapreduce.ispn.output.convertert", OutputConverter.class.getCanonicalName());
+
+        JobConf jobConf = new JobConf(configuration, Main.class);
         jobConf.setJobName("wordcount");
 
-        jobConf.setOutputKeyClass(String.class);
+        /*jobConf.setOutputKeyClass(String.class);
         jobConf.setOutputValueClass(Integer.class);
         jobConf.setOutputKeyComparatorClass(StringComparator.class);
         jobConf.set("io.serializations", "org.apache.hadoop.io.serializer.WritableSerialization,org.apache.hadoop.io.serializer.JavaSerialization");
+        */
+
+        jobConf.setOutputKeyClass(Text.class);
+        jobConf.setOutputValueClass(IntWritable.class);
 
         jobConf.setMapperClass(MapClass.class);
         jobConf.setReducerClass(ReduceClass.class);
-
-        jobConf.set("mapreduce.ispn.output.cache.name", "namedCache");
 
         //FileInputFormat.addInputPath(jobConf, new Path(args[0]));
         //FileOutputFormat.setOutputPath(jobConf, new Path(args[0]));
@@ -37,9 +54,13 @@ public class Main {
         System.out.println("Finished executing job.");
         System.out.println("CACHE CONTENT:");
 
-        RemoteCacheManager remoteCacheManager = new RemoteCacheManager();
-        RemoteCache cache = remoteCacheManager.getCache("namedCache");
-        System.out.println(cache.getBulk());
+        RemoteCacheManager remoteCacheManager = new RemoteCacheManager("172.17.0.14");
+        System.out.println(" =========================== INPUT ================================ ");
+        //System.out.println(remoteCacheManager.getCache("map-reduce-in").getBulk());
+        System.out.println(" ================================================================== ");
+        System.out.println(" =========================== OUTPUT =============================== ");
+        System.out.println(remoteCacheManager.getCache("map-reduce-out").getBulk());
+        System.out.println(" ================================================================== ");
 
     }
 
