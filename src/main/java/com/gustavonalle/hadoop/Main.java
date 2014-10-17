@@ -1,16 +1,14 @@
 package com.gustavonalle.hadoop;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparator;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
-import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.hadoopintegration.mapreduce.input.InfinispanInputFormat;
+import org.infinispan.hadoopintegration.mapreduce.output.InfinispanOutputFormat;
 
 import java.io.IOException;
 
@@ -45,24 +43,24 @@ public class Main {
         jobConf.setMapperClass(MapClass.class);
         jobConf.setReducerClass(ReduceClass.class);
 
-        FileInputFormat.addInputPath(jobConf, new Path(args[0]));
-        FileOutputFormat.setOutputPath(jobConf, new Path(args[1]));
-        //jobConf.setInputFormat(InfinispanInputFormat.class);
-        //jobConf.setOutputFormat(InfinispanOutputFormat.class);
+        //FileInputFormat.addInputPath(jobConf, new Path(args[0]));
+        //FileOutputFormat.setOutputPath(jobConf, new Path(args[1]));
+        jobConf.setInputFormat(InfinispanInputFormat.class);
+        jobConf.setOutputFormat(InfinispanOutputFormat.class);
         System.out.println("About to run the job!!!!");
         JobClient.runJob(jobConf);
 
         System.out.println("Finished executing job.");
         System.out.println("CACHE CONTENT:");
 
-        RemoteCacheManager remoteCacheManager = new RemoteCacheManager("10.35.23.11");
+        /*RemoteCacheManager remoteCacheManager = new RemoteCacheManager("10.35.23.11");
         System.out.println(" =========================== INPUT ================================ ");
         //System.out.println(remoteCacheManager.getCache("map-reduce-in").getBulk());
         System.out.println(" ================================================================== ");
         System.out.println(" =========================== OUTPUT =============================== ");
-        System.out.println(remoteCacheManager.getCache("map-reduce-out").getBulk());
+        //System.out.println(remoteCacheManager.getCache("map-reduce-out").getBulk());
         System.out.println(" ================================================================== ");
-
+        */
     }
 
     public static class StringComparator implements RawComparator<String> {

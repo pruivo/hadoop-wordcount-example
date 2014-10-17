@@ -128,12 +128,12 @@
         </subsystem>
         <subsystem xmlns="urn:infinispan:server:core:7.0" default-cache-container="clustered">
             <cache-container name="clustered" default-cache="default" statistics="true">
-                <transport executor="infinispan-transport" lock-timeout="60000" cluster="hadoop-ispn-cluster"/>
-                <distributed-cache name="map-reduce-in" mode="SYNC" segments="20" owners="2" remote-timeout="30000" start="EAGER">
+                <transport executor="infinispan-transport" lock-timeout="60000" cluster="hadoop-ispn-cluster" />
+                <distributed-cache name="map-reduce-in" mode="SYNC" segments="20" owners="1" remote-timeout="30000" start="EAGER">
                     <locking acquire-timeout="30000" concurrency-level="1000" striping="false"/>
                     <transaction mode="NONE"/>
                 </distributed-cache>
-                <distributed-cache name="map-reduce-out" mode="SYNC" segments="20" owners="2" remote-timeout="30000" start="EAGER">
+                <distributed-cache name="map-reduce-out" mode="SYNC" segments="20" owners="1" remote-timeout="30000" start="EAGER">
                     <locking acquire-timeout="30000" concurrency-level="1000" striping="false"/>
                     <transaction mode="NONE"/>
                 </distributed-cache>
@@ -165,8 +165,8 @@
             <cached-connection-manager/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:jgroups:1.2" default-stack="${jboss.default.jgroups.stack:udp}">
-            <stack name="udp">
+        <subsystem xmlns="urn:jboss:domain:jgroups:1.2" default-stack="${jboss.default.jgroups.stack:tcp}">
+            <!--stack name="udp">
                 <transport type="UDP" socket-binding="jgroups-udp"/>
                 <protocol type="PING"/>
                 <protocol type="MERGE2"/>
@@ -180,10 +180,12 @@
                 <protocol type="MFC"/>
                 <protocol type="FRAG2"/>
                 <protocol type="RSVP"/>
-            </stack>
+            </stack-->
             <stack name="tcp">
                 <transport type="TCP" socket-binding="jgroups-tcp"/>
-                <protocol type="MPING" socket-binding="jgroups-mping"/>
+                <protocol type="TCPPING">
+                    <property name="initial_hosts">10.35.23.11[7600],10.35.23.12[7600],10.35.23.13[7600],10.35.23.15[7600]</property>
+                </protocol>
                 <protocol type="MERGE2"/>
                 <protocol type="FD_SOCK" socket-binding="jgroups-tcp-fd"/>
                 <protocol type="FD"/>
@@ -194,7 +196,6 @@
                 <protocol type="UNICAST2"/>
                 <protocol type="pbcast.STABLE"/>
                 <protocol type="pbcast.GMS"/>
-                <protocol type="UFC"/>
                 <protocol type="MFC"/>
                 <protocol type="FRAG2"/>
                 <protocol type="RSVP"/>
