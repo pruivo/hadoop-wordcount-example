@@ -23,8 +23,8 @@ public class Main {
       String host = args[1];
       configuration.set("mapreduce.ispn.inputsplit.remote.cache.host", host);
 
-        configuration.set("mapreduce.ispn.input.remote.cache.host", "10.35.23.11");
-        configuration.set("mapreduce.ispn.output.remote.cache.host", "10.35.23.11");
+        configuration.set("mapreduce.ispn.input.remote.cache.host", host);
+        configuration.set("mapreduce.ispn.output.remote.cache.host", host);
 
         configuration.set("mapreduce.ispn.input.cache.name", "map-reduce-in");
         configuration.set("mapreduce.ispn.output.cache.name", "map-reduce-out");
