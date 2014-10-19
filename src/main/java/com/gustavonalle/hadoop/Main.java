@@ -14,10 +14,14 @@ import java.io.IOException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-        Configuration configuration = new Configuration();
-        //configuration.set("mapred.job.tracker", "172.17.0.13:9001");
-        configuration.set("mapreduce.ispn.inputsplit.remote.cache.host", "10.35.23.11");
+   public static void main(String[] args) throws IOException {
+      Configuration configuration = new Configuration();
+      if (args.length != 2) {
+         System.err.println("Usage: hadoop jar <job jar> com.gustavonalle.hadoop.Main <ispn-server>");
+         System.exit(2);
+      }
+      String host = args[1];
+      configuration.set("mapreduce.ispn.inputsplit.remote.cache.host", host);
 
         configuration.set("mapreduce.ispn.input.remote.cache.host", "10.35.23.11");
         configuration.set("mapreduce.ispn.output.remote.cache.host", "10.35.23.11");
